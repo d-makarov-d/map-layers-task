@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">MapLayersTask</string>
+
+    <!-- Control Pane -->
+    <string name="opacity">Прозрачность: %s%%</string>
+    <string name="sync_date">Синхр: %s</string>
+    <string name="num_elem">Эл-ов: %s</string>
+    <string name="zoom">Зум: %s</string>
+
+    <string name="title_layers">Слои</string>
+    <string name="title_pads">Подложки</string>
+    <string name="title_missions">Миссии</string>
 </resources>

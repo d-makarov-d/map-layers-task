@@ -1,36 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/main_drawer"
-    tools:openDrawer="end"
+    android:layout_width="match_parent"
     tools:context=".MainActivity">
 
-    <RelativeLayout
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/main_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"/>
 
-        <include layout="@layout/main_activity_content"/>
-
-        <ImageView
-            android:id="@+id/btn_show_right_pane"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_gravity="center_vertical"
-            android:layout_centerVertical="true"
-            android:tint="?attr/colorPrimaryVariant"
-            android:src="@drawable/outline_keyboard_arrow_left_24"/>
-
-    </RelativeLayout>
-
-    <include
-        layout="@layout/pane_right"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/pane_right"
-        android:layout_gravity="end"/>
-
-</androidx.drawerlayout.widget.DrawerLayout>
+</RelativeLayout>
