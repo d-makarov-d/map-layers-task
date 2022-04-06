@@ -1,6 +1,7 @@
 package com.danil.maplayerstask.util
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.ShapeDrawable
 import androidx.core.content.ContextCompat
 import com.danil.maplayerstask.R
@@ -12,6 +13,16 @@ object Util {
     fun generateLayers(context: Context): List<MapLayer> {
         return listOf(
             genEmptyLayer("Слой делян", null, true, context),
+            genEmptyLayer("Сигналы о лесоизменения, тестовая выборка с ув-ным шагом",
+                "Общие слои", true, context),
+            genEmptyLayer("Преграды для прохождения огня", null, true, context),
+            genEmptyLayer("Сигналы о лесоизменения, тестовая выборка с ув-ным шагом",
+                null, true, context),
+            genEmptyLayer("Преграды для прохождения огня", "Общие слои",
+                true, context),
+            genEmptyLayer("Контуры гарей", "Общие слои", false, context),
+            genEmptyLayer("Маска облачности от\n01.07.2021", "Общие слои",
+                true, context),
         )
     }
 }
@@ -20,7 +31,9 @@ private fun genEmptyLayer(
     name: String,
     category: String?,
     active: Boolean,
-    context: Context
+    context: Context,
+    icon: Drawable =
+        ContextCompat.getDrawable(context, R.drawable.outline_place_24) ?: ShapeDrawable()
 ): MapLayer = MapLayer(
     Random.nextLong(),
     name,
@@ -30,5 +43,6 @@ private fun genEmptyLayer(
     Random.nextInt(0, 10),
     Random.nextInt(11, 20),
     active,
-    ContextCompat.getDrawable(context, R.drawable.outline_place_24) ?: ShapeDrawable()
+    false,
+    icon
 )

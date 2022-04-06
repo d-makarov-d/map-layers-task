@@ -10,8 +10,17 @@ import com.danil.maplayerstask.util.Util
  */
 object LayerRepository {
     private val layers: MutableLiveData<List<MapLayer>> = MutableLiveData(listOf())
+    private var layersMap: MutableMap<Long, MapLayer> = mutableMapOf()
     fun init(context: Context) {
-        layers.value = Util.generateLayers(context)
+        updateLayers(Util.generateLayers(context))
     }
     fun getLayers(): LiveData<List<MapLayer>> = layers
+    fun updateLayer(newLayer: MapLayer) {
+        layersMap[newLayer.id()] = newLayer
+        layers.value = layersMap.values.toList()
+    }
+    private fun updateLayers(layers: List<MapLayer>) {
+        this.layers.value = layers
+        layersMap = layers.associateBy { it.id() }.toMutableMap()
+    }
 }

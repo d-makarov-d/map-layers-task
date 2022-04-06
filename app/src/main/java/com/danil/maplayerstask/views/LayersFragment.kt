@@ -33,5 +33,12 @@ class LayersFragment: Fragment() {
         LayerRepository.getLayers().observe(viewLifecycleOwner) { layers ->
             adapter.updateAll(layers)
         }
+
+        list.setOnItemClickListener { _, rowView, position, _ ->
+            val holder = rowView.tag as LayersArrayAdapter.ViewHolder
+            val item = adapter.getItem(position) ?: return@setOnItemClickListener
+
+            adapter.dropView(item, holder)
+        }
     }
 }

@@ -6,7 +6,7 @@ import java.util.*
 /**
  * Describes basic map layer
  */
-class MapLayer(
+open class MapLayer(
     private val id: Long,
     private val name: String,
     private val category: String?,
@@ -15,10 +15,10 @@ class MapLayer(
     private val minZoom: Int,
     private val maxZoom: Int,
     private val active: Boolean,
-    private val icon: Drawable
+    private val draw: Boolean,
+    private val icon: Drawable,
+    private val opacity: Float = 1f
 ) {
-    private val opacity = 1f
-
     fun id(): Long = id
     fun name(): String = name
     fun category(): String? = category
@@ -28,6 +28,7 @@ class MapLayer(
     fun zoomRange(): Pair<Int, Int> = Pair(minZoom, maxZoom)
     fun elements(): List<MapElement> = elements
     fun active(): Boolean = active
+    fun draw(): Boolean = draw
     fun icon(): Drawable = icon
     fun minZoom() = zoomRange().first
     fun maxZoom() = zoomRange().second
