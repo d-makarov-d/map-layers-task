@@ -2,10 +2,10 @@
     <string name="app_name">MapLayersTask</string>
 
     <!-- Control Pane -->
-    <string name="opacity">Прозрачность: %s%%</string>
+    <string name="opacity">Прозрачность: %.0f%%</string>
     <string name="sync_date">Синхр: %s</string>
-    <string name="num_elem">Эл-ов: %s</string>
-    <string name="zoom">Зум: %s</string>
+    <string name="num_elem">Эл-ов: %d</string>
+    <string name="zoom">Зум: %d-%d</string>
 
     <string name="title_layers">Слои</string>
     <string name="title_pads">Подложки</string>
