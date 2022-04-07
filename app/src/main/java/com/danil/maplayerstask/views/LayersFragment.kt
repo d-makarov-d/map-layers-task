@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
+import android.widget.ToggleButton
 import androidx.fragment.app.Fragment
 import com.danil.maplayerstask.R
 import com.danil.maplayerstask.adapters.LayersArrayAdapter
@@ -26,6 +27,7 @@ class LayersFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Initialize layers list
         val list: ListView = view.findViewById(R.id.layers_list)
         val adapter = LayersArrayAdapter(requireContext())
         list.adapter = adapter
@@ -40,5 +42,8 @@ class LayersFragment: Fragment() {
 
             adapter.dropView(item, holder)
         }
+
+        val reorder: ToggleButton = view.findViewById(R.id.btn_reorder)
+        reorder.setOnCheckedChangeListener { _, checked -> adapter.setReorder(checked)  }
     }
 }

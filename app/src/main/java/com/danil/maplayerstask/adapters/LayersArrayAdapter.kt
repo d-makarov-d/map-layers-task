@@ -39,6 +39,7 @@ class LayersArrayAdapter(
     private var layers: List<RowElement> = listOf()
     // list of first element in each category id
     private var headElementIds: List<Long> = listOf()
+    private var reorder = false
 
     data class ViewHolder(
         val mainRow: LinearLayout,
@@ -148,6 +149,14 @@ class LayersArrayAdapter(
             holder.switch.isClickable = false
         }
 
+        if (reorder) {
+            holder.reorder.visibility = ImageButton.VISIBLE
+            holder.switch.visibility = SwitchCompat.GONE
+        } else {
+            holder.reorder.visibility = ImageButton.GONE
+            holder.switch.visibility = SwitchCompat.VISIBLE
+        }
+
         return rowView
     }
 
@@ -210,6 +219,11 @@ class LayersArrayAdapter(
                 }
             }
         }
+    }
+
+    fun setReorder(reorder: Boolean) {
+        this.reorder = reorder
+        notifyDataSetChanged()
     }
 
     class RowElement(
