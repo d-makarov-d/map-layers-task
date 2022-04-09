@@ -85,12 +85,6 @@ class LayersFragment: Fragment() {
             adapter.notifyItemRangeChanged(0, adapter.itemCount)
         }
 
-        val reorder: ToggleButton = view.findViewById(R.id.btn_reorder)
-        reorder.setOnCheckedChangeListener { _, checked ->
-            adapter.setReorder(checked)
-            isReordering = checked
-        }
-
         val drawState: SeekBar = view.findViewById(R.id.draw_state)
         if (layersViewModel.drawSwitchMode.value == null)
             layersViewModel.drawSwitchMode.value = SwitchState.StateUndefined
@@ -104,5 +98,12 @@ class LayersFragment: Fragment() {
             override fun onStartTrackingTouch(p0: SeekBar?) {}
             override fun onStopTrackingTouch(p0: SeekBar?) {}
         })
+
+        val reorder: ToggleButton = view.findViewById(R.id.btn_reorder)
+        reorder.setOnCheckedChangeListener { _, checked ->
+            adapter.setReorder(checked)
+            isReordering = checked
+            drawState.visibility = if (checked) SeekBar.GONE else SeekBar.VISIBLE
+        }
     }
 }
