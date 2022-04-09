@@ -7,12 +7,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.danil.maplayerstask.models.LayerRepository
 import com.danil.maplayerstask.models.MapLayer
+import com.danil.maplayerstask.views.PadType
 
 class MapLayersViewModel: ViewModel() {
     val layersState: MutableLiveData<Map<Long, MapLayerState>> = MutableLiveData()
     val layers: MediatorLiveData<List<MapLayer>> = MediatorLiveData()
     val drawSwitchMode: MutableLiveData<SwitchState?> = MutableLiveData(null)
     var savedState: Map<Long, MapLayerState> = mapOf()
+    val padType: MutableLiveData<PadType> = MutableLiveData(PadType.Normal())
     init {
         layers.addSource(LayerRepository.getLayers()) { value ->
             if (layersState.value == null)

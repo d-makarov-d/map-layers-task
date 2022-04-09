@@ -7,10 +7,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.danil.maplayerstask.R
+import com.danil.maplayerstask.viewmodels.MapLayersViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
@@ -19,6 +22,9 @@ import com.google.android.material.tabs.TabLayoutMediator
 
 
 class MapWithControlsFragment: Fragment() {
+    private val layersViewModel: MapLayersViewModel by activityViewModels()
+    private var map: GoogleMap? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -32,7 +38,11 @@ class MapWithControlsFragment: Fragment() {
         // init map
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync {  }
+        mapFragment.getMapAsync { map ->
+            val type = layersViewModel.padType.value ?: PadType.members[0]
+            map.mapType = type.type
+            this.map = map
+        }
 
         // init drawer layout
         val dl: DrawerLayout = view.findViewById(R.id.main_drawer)
@@ -60,6 +70,12 @@ class MapWithControlsFragment: Fragment() {
                 else -> getString(LayersFragment.titleId)
             }
         }.attach()
+
+        // Map type change processing
+        layersViewModel.padType.observe(viewLifecycleOwner) { type ->
+            val mMap = map ?: return@observe
+            mMap.mapType = type.type
+        }
     }
 
     private class RightPanePagerAdapter(f: Fragment): FragmentStateAdapter(f) {

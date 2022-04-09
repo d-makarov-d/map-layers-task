@@ -10,4 +10,9 @@
     <string name="title_layers">Слои</string>
     <string name="title_pads">Подложки</string>
     <string name="title_missions">Миссии</string>
+
+    <string name="pad_normal">Normal</string>
+    <string name="pad_terrain">Terrain</string>
+    <string name="pad_hybrid">Hybrid</string>
+    <string name="pad_satellite">Satellite</string>
 </resources>
