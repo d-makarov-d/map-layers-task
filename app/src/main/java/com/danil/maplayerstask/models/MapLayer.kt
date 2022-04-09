@@ -8,7 +8,7 @@ import java.util.*
  */
 open class MapLayer(
     private val id: Long,
-    private val name: String,
+    var name: String,
     private val category: String?,
     private val sync: Date,
     private val elements: List<MapElement>,

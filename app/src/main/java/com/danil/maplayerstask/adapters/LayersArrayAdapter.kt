@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Typeface
 import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -11,16 +12,19 @@ import androidx.annotation.ColorInt
 import androidx.appcompat.widget.SwitchCompat
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.danil.maplayerstask.R
 import com.danil.maplayerstask.models.LayerRepository
 import com.danil.maplayerstask.models.MapLayer
+import com.danil.maplayerstask.util.Util
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 class LayersArrayAdapter(
-    context: Context
+    context: Context,
+    private val itemTouchHelper: ItemTouchHelper
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
         val diffCallback = object : DiffUtil.ItemCallback<RowElement>() {
@@ -60,8 +64,9 @@ class LayersArrayAdapter(
     private var headElementInds: List<Int> = listOf()
     private var headElementNames: Map<Int, String?> = mapOf()
     private var reorder = false
-    private val differ = AsyncListDiffer(this, diffCallback)
+    private var differ = AsyncListDiffer(this, diffCallback)
     private var recyclerView: RecyclerView? = null
+    private var primaryOrdering: Map<Long, Int>? = null
 
     class ViewHolder(
         view: View,
@@ -145,13 +150,21 @@ class LayersArrayAdapter(
             differ.currentList.find { l -> l.id() == it.id() }?.dropdownOpen ?: false
         ) }
         val grouped: Map<String?, List<RowElement>> = newLayers.groupBy { it.category() }
-        headElementInds = grouped.values.withIndex().fold(listOf()) { acc, v ->
-            acc + listOf(acc.lastOrNull() ?: 0 + v.value.size + v.index)
-        }
+        headElementInds = grouped.values.withIndex()
+            .fold<IndexedValue<List<RowElement>>, List<Int>>(listOf()) { acc, v ->
+                acc + listOf(acc.lastOrNull() ?: 0 + v.value.size + v.index)
+            }.dropLast(1)
         headElementNames = (headElementInds zip grouped.keys.drop(1)).toMap()
         val flat = grouped.toList().fold(listOf<RowElement>()) { l, r -> l + r.second }
-
-        differ.submitList(flat)
+        if (
+            primaryOrdering != null &&
+            primaryOrdering!!.size == flat.size &&
+            primaryOrdering!!.keys.containsAll(flat.map { it.id() })
+        ) {
+            differ.submitList(flat.sortedBy { primaryOrdering!![it.id()] } )
+        } else {
+            differ.submitList(flat)
+        }
     }
 
     fun setReorder(reorder: Boolean) {
@@ -164,7 +177,21 @@ class LayersArrayAdapter(
                 if (viewHolder.dropped()) viewHolder.dropView()
             }
         }
+        differ.currentList.forEach { it.dropdownOpen = false }
         notifyItemRangeChanged(0, itemCount)
+    }
+
+    fun moveItem(from: Int, to: Int): Boolean {
+        if (headElementInds.contains(from) || headElementInds.contains(to)) return false
+        if (differ.currentList[from].category() != differ.currentList[to].category()) return false
+        val l = differ.currentList.toMutableList()
+        Collections.swap(l, adjustedPos(from), adjustedPos(to))
+        primaryOrdering = (l.map { it.id() } zip (0 until l.size)).toMap()
+        AsyncListDiffer(this, diffCallback)
+        differ.submitList(l) { notifyItemMoved(adjustedPos(to), adjustedPos(from)) }
+        differ.currentList
+        notifyItemMoved(from, to)
+        return true
     }
 
     class RowElement(
@@ -180,8 +207,7 @@ class LayersArrayAdapter(
         return if (headElementInds.contains(position)) {
             super.getItemId(position)
         } else {
-            val ind = position - headElementInds.filter { it < position }.size
-            differ.currentList.getOrNull(ind)?.id() ?: super.getItemId(position)
+            differ.currentList.getOrNull(adjustedPos(position))?.id() ?: super.getItemId(position)
         }
     }
 
@@ -212,12 +238,24 @@ class LayersArrayAdapter(
             holder.category.text = headElementNames[position]
         } else {
             val holder = h as ViewHolder
-            val adjustedPos = position - headElementInds.filter { it < position }.size
-            val item = differ.currentList.getOrNull(adjustedPos) ?: return
+            val item = differ.currentList.getOrNull(adjustedPos(position)) ?: return
 
             holder.current = item
 
             holder.icon.setImageDrawable(item.icon())
+            if (item.dropdownOpen) {
+                holder.icon.setColorFilter(colorSecondary)
+                holder.title.typeface = Typeface.DEFAULT_BOLD
+                holder.title.setTextColor(colorSecondary)
+                holder.dropLayout.visibility = LinearLayout.VISIBLE
+                holder.drop.rotation = 90f
+            } else {
+                holder.icon.setColorFilter(colorOnPrimary)
+                holder.title.typeface = Typeface.DEFAULT
+                holder.title.setTextColor(colorOnPrimary)
+                holder.dropLayout.visibility = LinearLayout.GONE
+                holder.drop.rotation = -90f
+            }
             holder.title.text = item.name()
             holder.inactive.visibility = if (item.active()) ImageView.GONE else ImageView.VISIBLE
             holder.opacity.text = String.format(strOpacity, item.opacity() * 100f)
@@ -277,10 +315,20 @@ class LayersArrayAdapter(
                 holder.reorder.visibility = ImageButton.GONE
                 holder.switch.visibility = SwitchCompat.VISIBLE
             }
+
+            holder.reorder.setOnTouchListener { _, event ->
+                if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+                    itemTouchHelper.startDrag(holder)
+                }
+                return@setOnTouchListener true
+            }
         }
     }
 
     override fun getItemCount(): Int {
         return differ.currentList.size + headElementInds.size
     }
+
+    private fun adjustedPos(position: Int): Int =
+        position - headElementInds.filter { it < position }.size
 }
