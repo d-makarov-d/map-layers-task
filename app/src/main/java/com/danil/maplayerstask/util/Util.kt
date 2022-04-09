@@ -10,7 +10,9 @@ import java.util.*
 import kotlin.random.Random
 
 object Util {
+    var random = Random(0)
     fun generateLayers(context: Context): List<MapLayer> {
+        random = Random(0)
         return listOf(
             genEmptyLayer("Слой делян", null, true, context),
             genEmptyLayer("Сигналы о лесоизменения, тестовая выборка с ув-ным шагом",
@@ -54,7 +56,7 @@ private fun genEmptyLayer(
     icon: Drawable =
         ContextCompat.getDrawable(context, R.drawable.outline_place_24) ?: ShapeDrawable()
 ): MapLayer = MapLayer(
-    Random.nextLong(),
+    Util.random.nextLong(),
     name,
     category,
     Date(164e10.toLong() + Random.nextLong(1e10.toLong())),

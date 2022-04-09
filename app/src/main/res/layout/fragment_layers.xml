@@ -69,7 +69,7 @@
             android:drawableTint="@color/on_surf"/>
 
         <SeekBar
-            android:id="@+id/seekBar"
+            android:id="@+id/draw_state"
             style="@style/Widget.AppCompat.SeekBar.Discrete"
             android:layout_width="64dp"
             android:layout_height="wrap_content"

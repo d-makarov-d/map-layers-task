@@ -1,10 +1,14 @@
 package com.danil.maplayerstask.views
 
+import android.content.Context
 import android.os.Bundle
+import android.os.Parcel
+import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
+import android.widget.SeekBar
 import android.widget.ToggleButton
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -15,6 +19,7 @@ import com.danil.maplayerstask.R
 import com.danil.maplayerstask.adapters.LayersArrayAdapter
 import com.danil.maplayerstask.models.LayerRepository
 import com.danil.maplayerstask.viewmodels.MapLayersViewModel
+import com.danil.maplayerstask.viewmodels.SwitchState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -76,11 +81,28 @@ class LayersFragment: Fragment() {
         layersViewModel.layers.observe(viewLifecycleOwner) { layers ->
             adapter.updateAll(layers)
         }
+        layersViewModel.drawSwitchMode.observe(viewLifecycleOwner) {
+            adapter.notifyItemRangeChanged(0, adapter.itemCount)
+        }
 
         val reorder: ToggleButton = view.findViewById(R.id.btn_reorder)
         reorder.setOnCheckedChangeListener { _, checked ->
             adapter.setReorder(checked)
             isReordering = checked
         }
+
+        val drawState: SeekBar = view.findViewById(R.id.draw_state)
+        if (layersViewModel.drawSwitchMode.value == null)
+            layersViewModel.drawSwitchMode.value = SwitchState.StateUndefined
+        else
+            drawState.progress =
+                layersViewModel.drawSwitchMode.value?.state ?: SwitchState.StateUndefined.state
+        drawState.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+                layersViewModel.updateDrawState(p1)
+            }
+            override fun onStartTrackingTouch(p0: SeekBar?) {}
+            override fun onStopTrackingTouch(p0: SeekBar?) {}
+        })
     }
 }
