@@ -7,12 +7,18 @@ import android.view.ViewGroup
 import android.widget.ListView
 import android.widget.ToggleButton
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.danil.maplayerstask.R
 import com.danil.maplayerstask.adapters.LayersArrayAdapter
 import com.danil.maplayerstask.models.LayerRepository
+import com.danil.maplayerstask.viewmodels.MapLayersViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class LayersFragment: Fragment() {
     companion object {
@@ -20,6 +26,7 @@ class LayersFragment: Fragment() {
     }
     private val itemTouchHelper: ItemTouchHelper
     private var isReordering = false
+    private val layersViewModel: MapLayersViewModel by activityViewModels()
     init {
         val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or
@@ -62,11 +69,11 @@ class LayersFragment: Fragment() {
 
         // Initialize layers list
         val list: RecyclerView = view.findViewById(R.id.layers_list)
-        val adapter = LayersArrayAdapter(requireContext(), itemTouchHelper)
+        val adapter = LayersArrayAdapter(requireContext(), itemTouchHelper, layersViewModel)
         list.adapter = adapter
         itemTouchHelper.attachToRecyclerView(list)
 
-        LayerRepository.getLayers().observe(viewLifecycleOwner) { layers ->
+        layersViewModel.layers.observe(viewLifecycleOwner) { layers ->
             adapter.updateAll(layers)
         }
 

@@ -18,13 +18,15 @@ import com.danil.maplayerstask.R
 import com.danil.maplayerstask.models.LayerRepository
 import com.danil.maplayerstask.models.MapLayer
 import com.danil.maplayerstask.util.Util
+import com.danil.maplayerstask.viewmodels.MapLayersViewModel
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 class LayersArrayAdapter(
     context: Context,
-    private val itemTouchHelper: ItemTouchHelper
+    private val itemTouchHelper: ItemTouchHelper,
+    private val layersModel: MapLayersViewModel
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     companion object {
         val diffCallback = object : DiffUtil.ItemCallback<RowElement>() {
@@ -199,8 +201,7 @@ class LayersArrayAdapter(
         var dropdownOpen: Boolean
     ): MapLayer(
         layer.id(), layer.name(), layer.category(), layer.sync(), layer.elements(),
-        layer.minZoom(), layer.maxZoom(), layer.active(), layer.draw(), layer.icon(),
-        layer.opacity()
+        layer.minZoom(), layer.maxZoom(), layer.active(), layer.icon()
     )
 
     override fun getItemId(position: Int): Long {
@@ -241,6 +242,8 @@ class LayersArrayAdapter(
             val item = differ.currentList.getOrNull(adjustedPos(position)) ?: return
 
             holder.current = item
+            val opacity = layersModel.layersState.value?.get(item.id())?.opacity ?: 1f
+            val draw = layersModel.layersState.value?.get(item.id())?.draw ?: false
 
             holder.icon.setImageDrawable(item.icon())
             if (item.dropdownOpen) {
@@ -258,45 +261,31 @@ class LayersArrayAdapter(
             }
             holder.title.text = item.name()
             holder.inactive.visibility = if (item.active()) ImageView.GONE else ImageView.VISIBLE
-            holder.opacity.text = String.format(strOpacity, item.opacity() * 100f)
+            holder.opacity.text = String.format(strOpacity, opacity * 100f)
             holder.sync.text = String.format(
                 strSyncDate,
                 SimpleDateFormat("dd.MM.yyyy", Locale.US).format(item.sync())
             )
-            holder.seek.progress = (item.opacity() * 100).toInt()
+            holder.seek.progress = (opacity * 100).toInt()
             holder.nElements.text = String.format(strNElements, item.numElements())
             holder.zoom.text = String.format(strZoom, item.minZoom(), item.maxZoom())
 
             holder.drop.setOnClickListener { holder.dropView() }
-            holder.switch.isChecked = item.draw()
+            holder.switch.isChecked = draw
             holder.switch.setOnCheckedChangeListener { _, checked ->
-                val updatedLayer = MapLayer(
-                    item.id(), item.name(), item.category(), item.sync(), item.elements(),
-                    item.minZoom(), item.maxZoom(), item.active(), checked, item.icon()
-                )
-                LayerRepository.updateLayer(updatedLayer)
+                val id = holder.current?.id() ?: return@setOnCheckedChangeListener
+                layersModel.updateDraw(id, checked)
             }
             holder.seek.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
                     holder.opacity.text = String.format(strOpacity, p1.toFloat())
                     val seekBar = p0 ?: return
-                    val updatedLayer = MapLayer(
-                        item.id(), item.name(), item.category(), item.sync(), item.elements(),
-                        item.minZoom(), item.maxZoom(), item.active(), item.draw(), item.icon(),
-                        seekBar.progress.toFloat() / 100f
-                    )
-                    LayerRepository.updateLayer(updatedLayer)
+                    val id = holder.current?.id() ?: return
+                    layersModel.updateOpacity(id, seekBar.progress.toFloat() / 100f)
                 }
                 override fun onStartTrackingTouch(p0: SeekBar?) {}
                 override fun onStopTrackingTouch(p0: SeekBar?) {}
             })
-
-            /*if (headElementInds.contains(item.id()) && item.category() != null) {
-                holder.categoryLayout.visibility = LinearLayout.VISIBLE
-                holder.categoryTitle.text = item.category()
-            } else {
-                holder.categoryLayout.visibility = LinearLayout.GONE
-            }*/
 
             if (item.active()) {
                 holder.mainRow.alpha = 1f

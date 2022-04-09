@@ -62,6 +62,5 @@ private fun genEmptyLayer(
     Random.nextInt(0, 10),
     Random.nextInt(11, 20),
     active,
-    false,
     icon
 )

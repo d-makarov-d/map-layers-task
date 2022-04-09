@@ -12,7 +12,8 @@ object LayerRepository {
     private val layers: MutableLiveData<List<MapLayer>> = MutableLiveData(listOf())
     private var layersMap: MutableMap<Long, MapLayer> = mutableMapOf()
     fun init(context: Context) {
-        updateLayers(Util.generateLayers(context))
+        if (layers.value?.size == 0)
+            updateLayers(Util.generateLayers(context))
     }
     fun getLayers(): LiveData<List<MapLayer>> = layers
     fun updateLayer(newLayer: MapLayer) {
