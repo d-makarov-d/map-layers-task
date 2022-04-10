@@ -154,7 +154,7 @@ class LayersArrayAdapter(
         val grouped: Map<String?, List<RowElement>> = newLayers.groupBy { it.category() }
         headElementInds = grouped.values.withIndex()
             .fold<IndexedValue<List<RowElement>>, List<Int>>(listOf()) { acc, v ->
-                acc + listOf(acc.lastOrNull() ?: 0 + v.value.size + v.index)
+                acc + listOf((acc.lastOrNull() ?: 0) + v.value.size + v.index)
             }.dropLast(1)
         headElementNames = (headElementInds zip grouped.keys.drop(1)).toMap()
         val flat = grouped.toList().fold(listOf<RowElement>()) { l, r -> l + r.second }
@@ -185,13 +185,15 @@ class LayersArrayAdapter(
 
     fun moveItem(from: Int, to: Int): Boolean {
         if (headElementInds.contains(from) || headElementInds.contains(to)) return false
-        if (differ.currentList[from].category() != differ.currentList[to].category()) return false
+        if (
+            differ.currentList[adjustedPos(from)].category() !=
+            differ.currentList[adjustedPos(to)].category()
+        ) return false
         val l = differ.currentList.toMutableList()
         Collections.swap(l, adjustedPos(from), adjustedPos(to))
         primaryOrdering = (l.map { it.id() } zip (0 until l.size)).toMap()
         AsyncListDiffer(this, diffCallback)
         differ.submitList(l) { notifyItemMoved(adjustedPos(to), adjustedPos(from)) }
-        differ.currentList
         notifyItemMoved(from, to)
         return true
     }

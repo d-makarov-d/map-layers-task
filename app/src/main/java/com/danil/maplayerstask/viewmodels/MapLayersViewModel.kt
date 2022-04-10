@@ -6,8 +6,10 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.danil.maplayerstask.models.LayerRepository
+import com.danil.maplayerstask.models.MapElement
 import com.danil.maplayerstask.models.MapLayer
 import com.danil.maplayerstask.views.PadType
+import com.google.android.gms.maps.GoogleMap
 
 class MapLayersViewModel: ViewModel() {
     val layersState: MutableLiveData<Map<Long, MapLayerState>> = MutableLiveData()
@@ -87,6 +89,16 @@ data class MapLayerState(
     val opacity: Float,
 ) {
     constructor(layer: MapLayer): this(layer.id(), false, 1f)
+    fun apply(map: GoogleMap, element: MapElement) {
+        if (draw) {
+            if (!element.drawn())
+                element.draw(map)
+            element.setVisible(true)
+            element.setOpacity(opacity)
+        } else {
+            element.setVisible(false)
+        }
+    }
 }
 
 sealed class SwitchState(val state: Int){

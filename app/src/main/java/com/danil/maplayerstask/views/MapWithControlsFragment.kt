@@ -76,6 +76,14 @@ class MapWithControlsFragment: Fragment() {
             val mMap = map ?: return@observe
             mMap.mapType = type.type
         }
+
+        layersViewModel.layersState.observe(viewLifecycleOwner) { stateMap ->
+            val layers = layersViewModel.layers.value?.associate { it.id() to it } ?: return@observe
+            val mMap = map ?: return@observe
+            for (state in stateMap.values) {
+                layers[state.id]?.elements()?.map { state.apply(mMap, it) }
+            }
+        }
     }
 
     private class RightPanePagerAdapter(f: Fragment): FragmentStateAdapter(f) {
