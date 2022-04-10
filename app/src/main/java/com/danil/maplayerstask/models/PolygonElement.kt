@@ -25,13 +25,12 @@ class PolygonElement(
     override fun name(): String = name
     override fun bounds(): LatLngBounds = LatLngBounds(sw, ne)
     override fun draw(map: GoogleMap) {
-        if (polygon == null) {
-            val polyOptions = PolygonOptions()
-                .fillColor(Color.RED)
-                .strokeColor(Color.BLACK)
-                .addAll(borders)
-            polygon = map.addPolygon(polyOptions)
-        }
+        polygon?.remove()
+        val polyOptions = PolygonOptions()
+            .fillColor(Color.RED)
+            .strokeColor(Color.BLACK)
+            .addAll(borders)
+        polygon = map.addPolygon(polyOptions)
     }
 
     override fun setOpacity(opacity: Float) {

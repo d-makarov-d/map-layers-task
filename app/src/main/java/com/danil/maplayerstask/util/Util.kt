@@ -94,30 +94,14 @@ private fun getCitiesLayer(context: Context): MapLayer {
         LatLng(59.864322, 30.525782),
         LatLng(59.813582, 30.350838)
     )
-    val mgdCoords = listOf(
-        LatLng(59.532109, 150.894048),
-        LatLng(59.531950, 150.814960),
-        LatLng(59.537291, 150.772507),
-        LatLng(59.563836, 150.770110),
-        LatLng(59.579173, 150.795331),
-        LatLng(59.586386, 150.777824),
-        LatLng(59.598407, 150.780492),
-        LatLng(59.590213, 150.792991),
-        LatLng(59.581042, 150.814873),
-        LatLng(59.599939, 150.835454),
-        LatLng(59.594304, 150.856726),
-        LatLng(59.569606, 150.846322),
-        LatLng(59.565364, 150.912803)
-    )
     val msk = PolygonElement("Moscow", mskCoords)
     val spb = PolygonElement("SPB", spbCoords)
-    val mgd = PolygonElement("Magadan", mgdCoords)
     return MapLayer(
         Util.random.nextLong(),
         "Cities layer",
         "Drawable Layers",
         Date(164e10.toLong() + Random.nextLong(1e10.toLong())),
-        listOf(msk, spb, mgd),
+        listOf(msk, spb),
         0, 1,
         true,
         ContextCompat.getDrawable(context, R.drawable.outline_place_24) ?: ShapeDrawable()

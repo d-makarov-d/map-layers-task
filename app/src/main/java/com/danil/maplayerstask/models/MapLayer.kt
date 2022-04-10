@@ -1,6 +1,8 @@
 package com.danil.maplayerstask.models
 
 import android.graphics.drawable.Drawable
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import java.util.*
 
 /**
@@ -28,4 +30,17 @@ open class MapLayer(
     fun icon(): Drawable = icon
     fun minZoom() = zoomRange().first
     fun maxZoom() = zoomRange().second
+    fun bounds(): LatLngBounds {
+        // south-west corner
+        val sw = LatLng(
+            elements.minOf { it.bounds().southwest.latitude },
+            elements.minOf { it.bounds().southwest.longitude },
+        )
+        // north-east corner
+        val ne = LatLng(
+            elements.maxOf { it.bounds().northeast.latitude },
+            elements.maxOf { it.bounds().northeast.longitude },
+        )
+        return LatLngBounds(sw, ne)
+    }
 }

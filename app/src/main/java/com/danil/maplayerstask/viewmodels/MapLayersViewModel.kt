@@ -17,12 +17,29 @@ class MapLayersViewModel: ViewModel() {
     val drawSwitchMode: MutableLiveData<SwitchState?> = MutableLiveData(null)
     var savedState: Map<Long, MapLayerState> = mapOf()
     val padType: MutableLiveData<PadType> = MutableLiveData(PadType.Normal())
+    private val listeners: MutableList<LayerEventListener> = mutableListOf()
     init {
         layers.addSource(LayerRepository.getLayers()) { value ->
             if (layersState.value == null)
                 layersState.value = value.associate { it.id() to MapLayerState(it) }
             layers.setValue(value)
         }
+    }
+
+    fun interface LayerEventListener {
+        fun onEvent(event: LayerEvent)
+    }
+
+    fun addOnLayerEventListener(listener: LayerEventListener) {
+        listeners.add(listener)
+    }
+
+    fun removeOnLayerEventListener(listener: LayerEventListener) {
+        listeners.remove(listener)
+    }
+
+    fun handleLayerEvent(event: LayerEvent) {
+        listeners.forEach { it.onEvent(event) }
     }
 
     fun updateDraw(id: Long, draw: Boolean) {
@@ -91,12 +108,11 @@ data class MapLayerState(
     constructor(layer: MapLayer): this(layer.id(), false, 1f)
     fun apply(map: GoogleMap, element: MapElement) {
         if (draw) {
-            if (!element.drawn())
-                element.draw(map)
+            element.draw(map)
             element.setVisible(true)
             element.setOpacity(opacity)
         } else {
-            element.setVisible(false)
+            element.remove()
         }
     }
 }
@@ -105,4 +121,9 @@ sealed class SwitchState(val state: Int){
     object StateShowNone: SwitchState(0)
     object StateUndefined: SwitchState(1)
     object StateShowAll: SwitchState(2)
+}
+
+sealed class LayerEvent(val layer: MapLayer) {
+    class Aim(layer: MapLayer): LayerEvent(layer)
+    class List(layer: MapLayer): LayerEvent(layer)
 }

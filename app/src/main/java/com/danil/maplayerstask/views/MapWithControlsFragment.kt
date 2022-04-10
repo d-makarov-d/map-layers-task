@@ -1,5 +1,6 @@
 package com.danil.maplayerstask.views
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,9 +9,12 @@ import android.widget.ImageView
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.danil.maplayerstask.R
+import com.danil.maplayerstask.models.MapLayer
+import com.danil.maplayerstask.viewmodels.LayerEvent
 import com.danil.maplayerstask.viewmodels.MapLayersViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -82,6 +86,26 @@ class MapWithControlsFragment: Fragment() {
             val mMap = map ?: return@observe
             for (state in stateMap.values) {
                 layers[state.id]?.elements()?.map { state.apply(mMap, it) }
+            }
+        }
+
+        layersViewModel.addOnLayerEventListener { event ->
+            when (event) {
+                is LayerEvent.Aim -> {
+                    val update =
+                        CameraUpdateFactory.newLatLngBounds(event.layer.bounds(), 150)
+                    map?.animateCamera(update, 1000, null)
+                }
+                is LayerEvent.List -> {
+                    AlertDialog.Builder(requireContext())
+                        .setItems(event.layer.elements().map { it.name() }.toTypedArray()) { _, i ->
+                            val element = event.layer.elements()[i]
+                            val update =
+                                CameraUpdateFactory.newLatLngBounds(element.bounds(), 150)
+                            map?.animateCamera(update)
+                        }
+                        .show()
+                }
             }
         }
     }

@@ -18,6 +18,7 @@ import com.danil.maplayerstask.R
 import com.danil.maplayerstask.models.LayerRepository
 import com.danil.maplayerstask.models.MapLayer
 import com.danil.maplayerstask.util.Util
+import com.danil.maplayerstask.viewmodels.LayerEvent
 import com.danil.maplayerstask.viewmodels.MapLayersViewModel
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
@@ -72,6 +73,7 @@ class LayersArrayAdapter(
 
     class ViewHolder(
         view: View,
+        viewModel: MapLayersViewModel,
         @ColorInt private val colorOnPrimary: Int,
         @ColorInt private val colorSecondary: Int
     ): RecyclerView.ViewHolder(view) {
@@ -90,11 +92,19 @@ class LayersArrayAdapter(
         val nElements: TextView = view.findViewById(R.id.num_elem)
         val zoom: TextView = view.findViewById(R.id.zoom)
         val btnShowContours: ImageButton = view.findViewById(R.id.btn_show_contours)
-        val btnList: ImageButton = view.findViewById(R.id.btn_list)
-        val btnAim: ImageButton = view.findViewById(R.id.btn_aim)
+        private val btnList: ImageButton = view.findViewById(R.id.btn_list)
+        private val btnAim: ImageButton = view.findViewById(R.id.btn_aim)
         init {
             mainRow.setOnClickListener {
                 current?.let { dropView() }
+            }
+            btnAim.setOnClickListener {
+                val cur = current ?: return@setOnClickListener
+                viewModel.handleLayerEvent(LayerEvent.Aim(cur))
+            }
+            btnList.setOnClickListener {
+                val cur = current ?: return@setOnClickListener
+                viewModel.handleLayerEvent(LayerEvent.List(cur))
             }
         }
 
@@ -227,7 +237,7 @@ class LayersArrayAdapter(
         if (viewType == 0) {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.row_layer_controls, parent, false)
-            return ViewHolder(view, colorOnPrimary, colorSecondary)
+            return ViewHolder(view, layersModel, colorOnPrimary, colorSecondary)
         } else {
             val view = LayoutInflater.from(parent.context)
                 .inflate(R.layout.row_header, parent, false)
