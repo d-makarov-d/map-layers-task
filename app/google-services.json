@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "498679415063",
+    "project_id": "maplayerstask",
+    "storage_bucket": "maplayerstask.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:498679415063:android:919b1b770c409b07917752",
+        "android_client_info": {
+          "package_name": "com.danil.maplayerstask"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "498679415063-unamnd148uqdlkgv0kkeg6okornmf5vp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhPpZiFwHSACml24SqHK8hiN1HpCrpIoM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "498679415063-unamnd148uqdlkgv0kkeg6okornmf5vp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

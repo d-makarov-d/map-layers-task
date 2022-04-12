@@ -38,6 +38,10 @@ class MapLayersViewModel: ViewModel() {
         listeners.remove(listener)
     }
 
+    fun clearLayerEventListeners() {
+        listeners.clear()
+    }
+
     fun handleLayerEvent(event: LayerEvent) {
         listeners.forEach { it.onEvent(event) }
     }

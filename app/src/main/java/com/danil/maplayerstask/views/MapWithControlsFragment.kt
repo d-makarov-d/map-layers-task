@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import java.lang.RuntimeException
 
 
 class MapWithControlsFragment: Fragment() {
@@ -89,7 +90,10 @@ class MapWithControlsFragment: Fragment() {
             }
         }
 
+        layersViewModel.clearLayerEventListeners()
         layersViewModel.addOnLayerEventListener { event ->
+            if (event.layer.elements().isEmpty()) return@addOnLayerEventListener
+
             when (event) {
                 is LayerEvent.Aim -> {
                     val update =
