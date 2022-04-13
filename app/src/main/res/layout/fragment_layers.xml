@@ -15,7 +15,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp">
+        android:layout_marginLeft="8dp">
 
         <ImageButton
             android:id="@+id/btn_add"
@@ -23,8 +23,8 @@
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackground"
             android:scaleType="fitCenter"
-            android:padding="8dp"
-            android:src="@drawable/baseline_add_24"
+            android:padding="12dp"
+            android:src="@drawable/ic_add"
             android:tintMode="src_in"
             app:tint="@color/on_surf" />
 
@@ -35,8 +35,8 @@
             android:layout_marginHorizontal="4dp"
             android:background="?attr/selectableItemBackground"
             android:scaleType="fitCenter"
-            android:padding="8dp"
-            android:src="@drawable/outline_search_24"
+            android:padding="12dp"
+            android:src="@drawable/ic_search"
             app:tint="@color/on_surf"
             android:tintMode="src_in"/>
 
@@ -46,8 +46,8 @@
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackground"
             android:scaleType="fitCenter"
-            android:padding="8dp"
-            android:src="@drawable/outline_delete_24"
+            android:padding="12dp"
+            android:src="@drawable/ic_delete"
             app:tint="@color/on_surf"
             android:tintMode="src_in"/>
 

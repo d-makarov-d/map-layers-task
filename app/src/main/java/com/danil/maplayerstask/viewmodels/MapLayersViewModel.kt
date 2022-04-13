@@ -18,11 +18,18 @@ class MapLayersViewModel: ViewModel() {
     var savedState: Map<Long, MapLayerState> = mapOf()
     val padType: MutableLiveData<PadType> = MutableLiveData(PadType.Normal())
     private val listeners: MutableList<LayerEventListener> = mutableListOf()
+    val initialized: MediatorLiveData<Boolean> = MediatorLiveData()
     init {
         layers.addSource(LayerRepository.getLayers()) { value ->
             if (layersState.value == null)
                 layersState.value = value.associate { it.id() to MapLayerState(it) }
             layers.setValue(value)
+        }
+        initialized.addSource(layers) { v ->
+            initialized.setValue(v != null && layersState.value != null)
+        }
+        initialized.addSource(layersState) { v ->
+            initialized.setValue(v != null && layers.value != null)
         }
     }
 

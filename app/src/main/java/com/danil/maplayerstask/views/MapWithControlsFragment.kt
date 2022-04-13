@@ -47,6 +47,17 @@ class MapWithControlsFragment: Fragment() {
             val type = layersViewModel.padType.value ?: PadType.members[0]
             map.mapType = type.type
             this.map = map
+
+            // draw preselected layers
+            layersViewModel.initialized.observe(viewLifecycleOwner) { ready ->
+                if (!ready) return@observe
+
+                val layers = layersViewModel.layers.value?.associateBy { it.id() } ?: return@observe
+                val stateMap =  layersViewModel.layersState.value ?: return@observe
+                for (state in stateMap.values) {
+                    layers[state.id]?.elements()?.map { state.apply(map, it) }
+                }
+            }
         }
 
         // init drawer layout
