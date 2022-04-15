@@ -25,8 +25,7 @@
             android:scaleType="fitCenter"
             android:padding="12dp"
             android:src="@drawable/ic_add"
-            android:tintMode="src_in"
-            app:tint="@color/on_surf" />
+            android:tintMode="src_in" />
 
         <ImageButton
             android:id="@+id/btn_search"
@@ -37,7 +36,6 @@
             android:scaleType="fitCenter"
             android:padding="12dp"
             android:src="@drawable/ic_search"
-            app:tint="@color/on_surf"
             android:tintMode="src_in"/>
 
         <ImageButton
@@ -48,7 +46,6 @@
             android:scaleType="fitCenter"
             android:padding="12dp"
             android:src="@drawable/ic_delete"
-            app:tint="@color/on_surf"
             android:tintMode="src_in"/>
 
         <View

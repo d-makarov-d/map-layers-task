@@ -23,6 +23,10 @@ class MapLayersViewModel: ViewModel() {
         layers.addSource(LayerRepository.getLayers()) { value ->
             if (layersState.value == null)
                 layersState.value = value.associate { it.id() to MapLayerState(it) }
+            else
+                layersState.value = value.associate {
+                    it.id() to (layersState.value?.get(it.id()) ?: MapLayerState(it))
+                }
             layers.setValue(value)
         }
         initialized.addSource(layers) { v ->

@@ -16,38 +16,46 @@ object Util {
     fun generateLayers(context: Context): List<MapLayer> {
         random = Random(0)
         return listOf(
-            genEmptyLayer("Слой делян", null, true, context),
             getCitiesLayer(context),
+            genEmptyLayer("Папка со слоями", "Общие слои", true, context,
+                ContextCompat.getDrawable(context, R.drawable.ic_folder) ?: ShapeDrawable()),
             genEmptyLayer("Сигналы о лесоизменения, тестовая выборка с ув-ным шагом",
                 "Общие слои", true, context),
-            genEmptyLayer("Преграды для прохождения огня", null, true, context),
+            genEmptyLayer("Преграды для прохождения огня", null, true, context,
+                ContextCompat.getDrawable(context, R.drawable.ic_line) ?: ShapeDrawable()),
             genEmptyLayer("Сигналы о лесоизменения, тестовая выборка с ув-ным шагом",
                 null, true, context),
             genEmptyLayer("Преграды для прохождения огня", "Общие слои",
-                true, context),
-            genEmptyLayer("Контуры гарей", "Общие слои", false, context),
+                true, context,
+                ContextCompat.getDrawable(context, R.drawable.ic_line) ?: ShapeDrawable()),
+            genEmptyLayer("Контуры гарей", "Общие слои", false, context,
+                ContextCompat.getDrawable(context, R.drawable.ic_polygon) ?: ShapeDrawable()),
             genEmptyLayer("Маска облачности от\n01.07.2021", "Общие слои",
                 true, context,
-                ContextCompat.getDrawable(context, R.drawable.outline_pentagon_24) ?: ShapeDrawable()),
+                ContextCompat.getDrawable(context, R.drawable.ic_polygon) ?: ShapeDrawable()),
             genEmptyLayer("Маска облачности от\n02.07.2021", null,
                 true, context,
-                ContextCompat.getDrawable(context, R.drawable.outline_pentagon_24) ?: ShapeDrawable()),
+                ContextCompat.getDrawable(context, R.drawable.ic_polygon) ?: ShapeDrawable()),
             genEmptyLayer("Маска облачности от\n02.07.2021", null,
                 true, context,
-                ContextCompat.getDrawable(context, R.drawable.outline_pentagon_24) ?: ShapeDrawable()),
+                ContextCompat.getDrawable(context, R.drawable.ic_polygon) ?: ShapeDrawable()),
             genEmptyLayer("Маска облачности от\n12.01.2021", "Общие слои",
                 true, context,
-                ContextCompat.getDrawable(context, R.drawable.outline_pentagon_24) ?: ShapeDrawable()),
+                ContextCompat.getDrawable(context, R.drawable.ic_polygon) ?: ShapeDrawable()),
             genEmptyLayer("Маска облачности от\n01.07.2021", "Общие слои",
                 true, context,
-                ContextCompat.getDrawable(context, R.drawable.outline_pentagon_24) ?: ShapeDrawable()),
+                ContextCompat.getDrawable(context, R.drawable.ic_polygon_hatched_2) ?: ShapeDrawable()),
             genEmptyLayer("Маска облачности от\n12.01.2021", "Общие слои",
                 true, context,
-                ContextCompat.getDrawable(context, R.drawable.outline_pentagon_24) ?: ShapeDrawable()),
+                ContextCompat.getDrawable(context, R.drawable.ic_polygon) ?: ShapeDrawable()),
             genEmptyLayer("Маска облачности от\n12.01.2021", "Общие слои",
                 true, context,
-                ContextCompat.getDrawable(context, R.drawable.outline_pentagon_24) ?: ShapeDrawable()),
-        )
+                ContextCompat.getDrawable(context, R.drawable.ic_polygon) ?: ShapeDrawable()),
+        ) + (13 .. 19).map {
+            genEmptyLayer("Маска облачности от\n${it}.01.2021", "Общие слои",
+                true, context,
+                ContextCompat.getDrawable(context, R.drawable.ic_polygon) ?: ShapeDrawable())
+        }
     }
 }
 
@@ -57,7 +65,7 @@ private fun genEmptyLayer(
     active: Boolean,
     context: Context,
     icon: Drawable =
-        ContextCompat.getDrawable(context, R.drawable.outline_place_24) ?: ShapeDrawable()
+        ContextCompat.getDrawable(context, R.drawable.ic_waypoint) ?: ShapeDrawable()
 ): MapLayer = MapLayer(
     Util.random.nextLong(),
     name,
@@ -98,12 +106,12 @@ private fun getCitiesLayer(context: Context): MapLayer {
     val spb = PolygonElement("SPB", spbCoords)
     return MapLayer(
         Util.random.nextLong(),
-        "Cities layer",
-        "Drawable Layers",
+        "Слой делян",
+        null,
         Date(164e10.toLong() + Random.nextLong(1e10.toLong())),
         listOf(msk, spb),
         0, 1,
         true,
-        ContextCompat.getDrawable(context, R.drawable.outline_place_24) ?: ShapeDrawable()
+        ContextCompat.getDrawable(context, R.drawable.ic_geometry_collection) ?: ShapeDrawable()
     )
 }
