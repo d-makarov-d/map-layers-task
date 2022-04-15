@@ -53,7 +53,8 @@
             android:id="@+id/layer_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="8dp" />
+            android:layout_marginHorizontal="8dp"
+            app:trackTint="@color/switch_layer_bg"/>
 
         <ImageButton
             android:id="@+id/btn_reorder"

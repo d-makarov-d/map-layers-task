@@ -11,6 +11,7 @@ class PolygonElement(
     private val name: String,
     private val borders: List<LatLng>
 ): MapElement() {
+    private var map: GoogleMap? = null
     // south-west corner
     private val sw = LatLng(
         borders.minOf { it.latitude },
@@ -25,12 +26,15 @@ class PolygonElement(
     override fun name(): String = name
     override fun bounds(): LatLngBounds = LatLngBounds(sw, ne)
     override fun draw(map: GoogleMap) {
-        polygon?.remove()
-        val polyOptions = PolygonOptions()
-            .fillColor(Color.RED)
-            .strokeColor(Color.BLACK)
-            .addAll(borders)
-        polygon = map.addPolygon(polyOptions)
+        if (this.map !== map) {
+            polygon?.remove()
+            val polyOptions = PolygonOptions()
+                .fillColor(Color.RED)
+                .strokeColor(Color.BLACK)
+                .addAll(borders)
+            polygon = map.addPolygon(polyOptions)
+            this.map = map
+        }
     }
 
     override fun setOpacity(opacity: Float) {

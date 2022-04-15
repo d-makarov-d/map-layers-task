@@ -5,13 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
+import android.widget.Switch
 import android.widget.ToggleButton
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.danil.maplayerstask.R
 import com.danil.maplayerstask.adapters.LayersArrayAdapter
+import com.danil.maplayerstask.util.Switch3Pos
 import com.danil.maplayerstask.viewmodels.MapLayersViewModel
 import com.danil.maplayerstask.viewmodels.SwitchState
 
@@ -75,25 +78,32 @@ class LayersFragment: Fragment() {
             adapter.notifyItemRangeChanged(0, adapter.itemCount)
         }
 
-        val drawState: SeekBar = view.findViewById(R.id.draw_state)
-        if (layersViewModel.drawSwitchMode.value == null)
-            layersViewModel.drawSwitchMode.value = SwitchState.StateUndefined
-        else
-            drawState.progress =
-                layersViewModel.drawSwitchMode.value?.state ?: SwitchState.StateUndefined.state
-        drawState.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
-                layersViewModel.updateDrawState(p1)
+        val drawState: SwitchCompat = view.findViewById(R.id.draw_state)
+        val switchState = Switch3Pos(drawState)
+        if (layersViewModel.drawSwitchMode.value != null)
+            switchState.setState(layersViewModel.drawSwitchMode.value ?: SwitchState.StateUndefined)
+        switchState.setOnStateChangeListener { state, byUser ->
+            if (byUser) layersViewModel.updateDrawState(state)
+        }
+
+        layersViewModel.layersState.observe(viewLifecycleOwner) {  state ->
+            val layersState = state ?: return@observe
+            if (layersState.all { it.value.draw }) {
+                switchState.setState(SwitchState.StateShowAll)
+            } else if (layersState.all { !it.value.draw }) {
+                switchState.setState(SwitchState.StateShowNone)
+            } else if (switchState.state() !is SwitchState.StateUndefined) {
+                layersViewModel.savedState = layersState
+                layersViewModel.updateDrawState(SwitchState.StateUndefined)
+                switchState.setState(SwitchState.StateUndefined)
             }
-            override fun onStartTrackingTouch(p0: SeekBar?) {}
-            override fun onStopTrackingTouch(p0: SeekBar?) {}
-        })
+        }
 
         val reorder: ToggleButton = view.findViewById(R.id.btn_reorder)
         reorder.setOnCheckedChangeListener { _, checked ->
             adapter.setReorder(checked)
             isReordering = checked
-            drawState.visibility = if (checked) SeekBar.GONE else SeekBar.VISIBLE
+            drawState.visibility = if (checked) SeekBar.GONE else SwitchCompat.VISIBLE
         }
     }
 }

@@ -15,7 +15,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp">
+        android:layout_marginHorizontal="8dp">
 
         <ImageButton
             android:id="@+id/btn_add"
@@ -57,7 +57,7 @@
             android:id="@+id/btn_reorder"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginHorizontal="6dp"
+            android:layout_marginLeft="6dp"
             android:drawableTop="@drawable/reorder_24"
             android:background="@drawable/toggle_reorder_bg"
             android:textOn=""
@@ -65,17 +65,11 @@
             android:paddingTop="11dp"
             android:drawableTint="@color/on_surf"/>
 
-        <SeekBar
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/draw_state"
-            style="@style/Widget.AppCompat.SeekBar.Discrete"
-            android:layout_width="64dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:max="2"
-            android:scaleX="1.5"
-            android:scaleY="1.5"
-            android:layout_margin="4dp"
-            android:progress="1"/>
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"/>
 
 
     </LinearLayout>

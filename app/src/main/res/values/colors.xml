@@ -6,6 +6,7 @@
     <color name="grin_light">#80e27e</color>
     <color name="grin_dark">#59BD87</color>
     <color name="on_surf">#80FFFFFF</color>
+    <color name="switch_layer_bg">#61FFFFFF</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="controls_gray">#969BAA</color>

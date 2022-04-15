@@ -70,15 +70,7 @@ class MapLayersViewModel: ViewModel() {
         state[id] = state[id]!!.copy(opacity = opacity)
         layersState.value = state
     }
-    fun updateDrawState(state: Int) {
-        if (state < 0 || state > 2) return
-        val newState = when (state) {
-            0 -> SwitchState.StateShowNone
-            1 -> SwitchState.StateUndefined
-            2 -> SwitchState.StateShowAll
-            else -> SwitchState.StateShowNone
-        }
-
+    fun updateDrawState(newState: SwitchState) {
         val value = layersState.value?.toMap() ?: return
         when (newState) {
             SwitchState.StateShowNone -> {
@@ -127,15 +119,15 @@ data class MapLayerState(
             element.setVisible(true)
             element.setOpacity(opacity)
         } else {
-            element.remove()
+            element.setVisible(false)
         }
     }
 }
 
-sealed class SwitchState(val state: Int){
-    object StateShowNone: SwitchState(0)
-    object StateUndefined: SwitchState(1)
-    object StateShowAll: SwitchState(2)
+sealed class SwitchState{
+    object StateShowNone: SwitchState()
+    object StateUndefined: SwitchState()
+    object StateShowAll: SwitchState()
 }
 
 sealed class LayerEvent(val layer: MapLayer) {
