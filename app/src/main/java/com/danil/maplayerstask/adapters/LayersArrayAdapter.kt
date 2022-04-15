@@ -268,12 +268,14 @@ class LayersArrayAdapter(
                 holder.title.typeface = Typeface.DEFAULT_BOLD
                 holder.title.setTextColor(colorSecondary)
                 holder.dropLayout.visibility = LinearLayout.VISIBLE
+                holder.dropLayout.alpha = 1f
                 holder.drop.rotation = 90f
             } else {
                 holder.icon.setColorFilter(colorOnPrimary)
                 holder.title.typeface = Typeface.DEFAULT
                 holder.title.setTextColor(colorOnPrimary)
                 holder.dropLayout.visibility = LinearLayout.GONE
+                holder.dropLayout.alpha = 0f
                 holder.drop.rotation = -90f
             }
             holder.title.text = item.name()
