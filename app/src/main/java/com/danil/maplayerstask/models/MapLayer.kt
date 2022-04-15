@@ -19,6 +19,7 @@ open class MapLayer(
     private val active: Boolean,
     private val icon: Drawable
 ) {
+    var dash: Boolean = false
     fun id(): Long = id
     fun name(): String = name
     fun category(): String? = category

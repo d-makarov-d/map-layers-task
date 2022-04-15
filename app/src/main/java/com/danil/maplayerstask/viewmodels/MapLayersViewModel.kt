@@ -133,4 +133,5 @@ sealed class SwitchState{
 sealed class LayerEvent(val layer: MapLayer) {
     class Aim(layer: MapLayer): LayerEvent(layer)
     class List(layer: MapLayer): LayerEvent(layer)
+    class Dash(layer: MapLayer): LayerEvent(layer)
 }

@@ -12,6 +12,6 @@ abstract class MapElement {
     abstract fun draw(map: GoogleMap)
     abstract fun setOpacity(opacity: Float)
     abstract fun setVisible(visible: Boolean)
+    abstract fun setDash(set: Boolean, map: GoogleMap)
     abstract fun remove()
-    abstract fun drawn(): Boolean
 }

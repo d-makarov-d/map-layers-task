@@ -121,6 +121,10 @@ class MapWithControlsFragment: Fragment() {
                         }
                         .show()
                 }
+                is LayerEvent.Dash -> {
+                    val mMap = map ?: return@addOnLayerEventListener
+                    event.layer.elements().forEach { it.setDash(event.layer.dash, mMap) }
+                }
             }
         }
     }

@@ -91,7 +91,7 @@ class LayersArrayAdapter(
         val seek: SeekBar = view.findViewById(R.id.seek)
         val nElements: TextView = view.findViewById(R.id.num_elem)
         val zoom: TextView = view.findViewById(R.id.zoom)
-        val btnShowContours: ImageButton = view.findViewById(R.id.btn_show_contours)
+        val btnShowContours: ToggleButton = view.findViewById(R.id.btn_show_contours)
         private val btnList: ImageButton = view.findViewById(R.id.btn_list)
         private val btnAim: ImageButton = view.findViewById(R.id.btn_aim)
         init {
@@ -105,6 +105,11 @@ class LayersArrayAdapter(
             btnList.setOnClickListener {
                 val cur = current ?: return@setOnClickListener
                 viewModel.handleLayerEvent(LayerEvent.List(cur))
+            }
+            btnShowContours.setOnCheckedChangeListener { _, checked ->
+                val cur = current ?: return@setOnCheckedChangeListener
+                cur.dash = checked
+                viewModel.handleLayerEvent(LayerEvent.Dash(cur))
             }
         }
 

@@ -2,10 +2,7 @@ package com.danil.maplayerstask.models
 
 import android.graphics.Color
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.Polygon
-import com.google.android.gms.maps.model.PolygonOptions
+import com.google.android.gms.maps.model.*
 
 class PolygonElement(
     private val name: String,
@@ -23,6 +20,7 @@ class PolygonElement(
         borders.maxOf { it.longitude }
     )
     private var polygon: Polygon? = null
+    private var dash: Polyline? = null
     override fun name(): String = name
     override fun bounds(): LatLngBounds = LatLngBounds(sw, ne)
     override fun draw(map: GoogleMap) {
@@ -52,5 +50,14 @@ class PolygonElement(
         polygon?.remove()
     }
 
-    override fun drawn(): Boolean = polygon != null
+    override fun setDash(set: Boolean, map: GoogleMap) {
+        dash?.remove()
+        if (set) {
+            val options = PolylineOptions()
+                .color(Color.BLACK)
+                .addAll(borders)
+            dash = map.addPolyline(options)
+            dash?.pattern = listOf(Dash(20F), Gap(20F))
+        }
+    }
 }
