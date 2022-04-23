@@ -27,6 +27,7 @@ class MapLayersViewModel: ViewModel() {
                 layersState.value = value.associate {
                     it.id() to (layersState.value?.get(it.id()) ?: MapLayerState(it))
                 }
+            savedState = layersState.value ?: mapOf()
             layers.setValue(value)
         }
         initialized.addSource(layers) { v ->
@@ -62,7 +63,11 @@ class MapLayersViewModel: ViewModel() {
         val state = (layersState.value ?: return).toMutableMap()
         state[id] = state[id]!!.copy(draw = draw)
         layersState.value = state
-        if (drawSwitchMode.value == SwitchState.StateUndefined) savedState = layersState.value!!
+        if (
+            (drawSwitchMode.value == SwitchState.StateUndefined || drawSwitchMode.value == null)
+            && state.count { it.value.draw } > 0
+        )
+            savedState = layersState.value!!
     }
     fun updateOpacity(id: Long, opacity: Float) {
         if (layersState.value?.containsKey(id) != true) return
