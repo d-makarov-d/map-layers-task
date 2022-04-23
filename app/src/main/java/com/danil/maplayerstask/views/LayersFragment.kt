@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.danil.maplayerstask.R
 import com.danil.maplayerstask.adapters.LayersArrayAdapter
 import com.danil.maplayerstask.util.Switch3Pos
@@ -70,6 +71,7 @@ class LayersFragment: Fragment() {
         val adapter = LayersArrayAdapter(requireContext(), itemTouchHelper, layersViewModel)
         list.adapter = adapter
         itemTouchHelper.attachToRecyclerView(list)
+        (list.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
 
         layersViewModel.layers.observe(viewLifecycleOwner) { layers ->
             adapter.updateAll(layers)

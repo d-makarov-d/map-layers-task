@@ -36,7 +36,8 @@
             android:layout_marginStart="8dp"
             android:src="@drawable/ic_invisible"
             android:visibility="gone"
-            app:tint="@color/controls_gray"/>
+            app:tint="@color/controls_gray"
+            android:layout_marginRight="8dp"/>
 
         <ImageButton
             android:id="@+id/btn_dropdown"
@@ -61,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:layout_marginHorizontal="20dp"
+            android:layout_marginHorizontal="12dp"
             android:layout_gravity="center"
             android:src="@drawable/reorder_24"
             android:tint="@color/on_surf"

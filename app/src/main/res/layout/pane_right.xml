@@ -13,11 +13,14 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         app:tabSelectedTextColor="?attr/colorOnPrimary"
-        app:tabTextColor="@color/on_surf"/>
+        app:tabTextColor="@color/on_surf"
+        app:tabTextAppearance="@style/LayersTabsText"
+        app:tabGravity="start"
+        app:tabMode="scrollable"/>
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/pager"
         android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="0dp"/>
+        android:layout_height="0dp" />
 
 </LinearLayout>
