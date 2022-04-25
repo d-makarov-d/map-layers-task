@@ -2,6 +2,7 @@ package com.danil.maplayerstask.adapters
 
 import android.content.Context
 import android.graphics.Typeface
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -70,6 +71,7 @@ class LayersArrayAdapter(
     private var differ = AsyncListDiffer(this, diffCallback)
     private var recyclerView: RecyclerView? = null
     private var primaryOrdering: Map<Long, Int>? = null
+    private var isSearching = false
 
     class ViewHolder(
         view: View,
@@ -166,7 +168,11 @@ class LayersArrayAdapter(
             it,
             differ.currentList.find { l -> l.id() == it.id() }?.dropdownOpen ?: false
         ) }
-        val grouped: Map<String?, List<RowElement>> = newLayers.groupBy { it.category() }
+        val grouped: SortedMap<String?, List<RowElement>> = newLayers
+            .groupBy { it.category() }
+            .toSortedMap { key1, key2 ->
+                if (key1 == null) -1 else if (key2 == null) 1 else key1.compareTo(key2)
+            }
         headElementInds = grouped.values.withIndex()
             .fold<IndexedValue<List<RowElement>>, List<Int>>(listOf()) { acc, v ->
                 acc + listOf((acc.lastOrNull() ?: 0) + v.value.size + v.index)
@@ -180,6 +186,8 @@ class LayersArrayAdapter(
         ) {
             differ.submitList(flat.sortedBy { primaryOrdering!![it.id()] } )
         } else {
+            if (flat.size <= 1)
+                notifyItemRangeRemoved(0, differ.currentList.size)
             differ.submitList(flat)
         }
     }
@@ -334,9 +342,18 @@ class LayersArrayAdapter(
     }
 
     override fun getItemCount(): Int {
+        Log.i("I", "COUNT === ${differ.currentList.size + headElementInds.size}")
         return differ.currentList.size + headElementInds.size
     }
 
     private fun adjustedPos(position: Int): Int =
         position - headElementInds.filter { it < position }.size
+
+    fun updateSearchState(search: Boolean) {
+        if (isSearching != search) {
+            isSearching = search
+            notifyItemRangeRemoved(0, differ.currentList.size)
+            differ.submitList(null)
+        }
+    }
 }

@@ -15,4 +15,6 @@
     <string name="pad_terrain">Terrain</string>
     <string name="pad_hybrid">Hybrid</string>
     <string name="pad_satellite">Satellite</string>
+
+    <string name="hint_layers_query">Лесничество / уч.лесничество / кв. 2 / в. 3-5</string>
 </resources>

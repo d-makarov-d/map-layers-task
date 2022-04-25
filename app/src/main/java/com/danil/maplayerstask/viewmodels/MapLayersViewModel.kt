@@ -14,11 +14,14 @@ import com.google.android.gms.maps.GoogleMap
 class MapLayersViewModel: ViewModel() {
     val layersState: MutableLiveData<Map<Long, MapLayerState>> = MutableLiveData()
     val layers: MediatorLiveData<List<MapLayer>> = MediatorLiveData()
+    val layersFiltered: MediatorLiveData<List<MapLayer>> = MediatorLiveData()
     val drawSwitchMode: MutableLiveData<SwitchState?> = MutableLiveData(null)
     var savedState: Map<Long, MapLayerState> = mapOf()
     val padType: MutableLiveData<PadType> = MutableLiveData(PadType.Normal())
     private val listeners: MutableList<LayerEventListener> = mutableListOf()
     val initialized: MediatorLiveData<Boolean> = MediatorLiveData()
+    var filter: ((String) -> Boolean)? = null
+    val searchText: MutableLiveData<String?> = MutableLiveData()
     init {
         layers.addSource(LayerRepository.getLayers()) { value ->
             if (layersState.value == null)
@@ -35,6 +38,18 @@ class MapLayersViewModel: ViewModel() {
         }
         initialized.addSource(layersState) { v ->
             initialized.setValue(v != null && layers.value != null)
+        }
+        layersFiltered.addSource(layers) {
+            layersFiltered.setValue(it.filter { l -> filter?.invoke(l.name()) ?: true })
+        }
+        layersFiltered.addSource(searchText) { search ->
+            val filter: ((String) -> Boolean)? = if (search.isNullOrBlank())
+                null
+            else
+                { str -> str.contains(search, ignoreCase = true) }
+            this.filter = filter
+            val lrs = layers.value ?: return@addSource
+            layersFiltered.setValue(lrs.filter { l -> filter?.invoke(l.name()) ?: true })
         }
     }
 
@@ -63,10 +78,7 @@ class MapLayersViewModel: ViewModel() {
         val state = (layersState.value ?: return).toMutableMap()
         state[id] = state[id]!!.copy(draw = draw)
         layersState.value = state
-        if (
-            (drawSwitchMode.value == SwitchState.StateUndefined || drawSwitchMode.value == null)
-            && state.count { it.value.draw } > 0
-        )
+        if ((drawSwitchMode.value == SwitchState.StateUndefined || drawSwitchMode.value == null))
             savedState = layersState.value!!
     }
     fun updateOpacity(id: Long, opacity: Float) {
