@@ -1,5 +1,7 @@
 package com.danil.maplayerstask.views
 
+import android.app.AlertDialog
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -19,10 +21,15 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import com.danil.maplayerstask.R
+import com.danil.maplayerstask.adapters.DrawablesSpinnerAdapter
 import com.danil.maplayerstask.adapters.LayersArrayAdapter
+import com.danil.maplayerstask.models.LayerRepository
+import com.danil.maplayerstask.models.MapLayer
 import com.danil.maplayerstask.util.Switch3Pos
 import com.danil.maplayerstask.viewmodels.MapLayersViewModel
 import com.danil.maplayerstask.viewmodels.SwitchState
+import java.util.*
+import kotlin.random.Random
 
 class LayersFragment: Fragment() {
     companion object {
@@ -156,6 +163,53 @@ class LayersFragment: Fragment() {
         btnDelete.setOnCheckedChangeListener { _, checked ->
             layersViewModel.deleteMode = checked
             adapter.notifyItemRangeChanged(0, adapter.itemCount)
+        }
+
+        // Add layer key
+        val btnAddLayer: ImageButton = view.findViewById(R.id.btn_add)
+        btnAddLayer.setOnClickListener {
+            val root =
+                LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_layer, null)
+
+            val name: EditText = root.findViewById(R.id.name)
+            val category: EditText = root.findViewById(R.id.category)
+            val spinner: Spinner = root.findViewById(R.id.drawable)
+            spinner.adapter = DrawablesSpinnerAdapter(requireContext())
+
+            val dialog = AlertDialog.Builder(requireContext())
+                .setView(root)
+                .setPositiveButton(R.string.dialog_confirm, null)
+                .setNegativeButton(R.string.dialog_cancel, null)
+                .create()
+            dialog.setOnShowListener { dlg ->
+                val posBtn = (dlg as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE)
+                posBtn.setOnClickListener {
+                    if (name.text.toString().isBlank()) {
+                        AlertDialog.Builder(requireContext())
+                            .setPositiveButton(R.string.dialog_confirm, null)
+                            .setTitle(R.string.title_error)
+                            .setMessage(R.string.msg_set_name)
+                            .show()
+                    } else {
+                        var c: String? = category.text.toString()
+                        if (c.isNullOrBlank()) c = null
+                        val layer = MapLayer(
+                            Random.nextLong(),
+                            name.text.toString(),
+                            c,
+                            Date(),
+                            listOf(),
+                            0,
+                            1,
+                            true,
+                            spinner.selectedItem as Drawable
+                        )
+                        LayerRepository.add(layer)
+                        dialog.dismiss()
+                    }
+                }
+            }
+            dialog.show()
         }
     }
 }

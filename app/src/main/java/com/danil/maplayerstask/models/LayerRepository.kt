@@ -35,4 +35,9 @@ object LayerRepository {
         this.layers.value = layersMap.values.toList()
         return true
     }
+
+    fun add(layer: MapLayer) {
+        layersMap[layer.id()] = layer
+        this.layers.value = layersMap.values.toList()
+    }
 }
