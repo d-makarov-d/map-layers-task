@@ -3,7 +3,6 @@ package com.danil.maplayerstask.views
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -11,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.annotation.ColorInt
-import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
@@ -143,14 +141,22 @@ class LayersFragment: Fragment() {
         search.text = layersViewModel.searchText.value
 
         // Searchbar toggle key
-        val searchBtn: ToggleButton = view.findViewById(R.id.btn_search)
+        val btnSearch: ToggleButton = view.findViewById(R.id.btn_search)
         val searchLayout: LinearLayout = view.findViewById(R.id.search_bar)
-        searchBtn.setOnCheckedChangeListener { _, checked ->
+        btnSearch.setOnCheckedChangeListener { _, checked ->
             searchLayout.visibility = if (checked) LinearLayout.VISIBLE else LinearLayout.GONE
             if (!checked) search.text = null
         }
-        searchBtn.isChecked = layersViewModel.searchText.value?.isNotBlank() ?: false
-        if (!searchBtn.isChecked)
+        btnSearch.isChecked = layersViewModel.searchText.value?.isNotBlank() ?: false
+        if (!btnSearch.isChecked)
             searchLayout.visibility = LinearLayout.GONE
+
+        // Delete toggle key
+        val btnDelete: ToggleButton = view.findViewById(R.id.btn_delete)
+        btnDelete.isChecked = layersViewModel.deleteMode
+        btnDelete.setOnCheckedChangeListener { _, checked ->
+            layersViewModel.deleteMode = checked
+            adapter.notifyItemRangeChanged(0, adapter.itemCount)
+        }
     }
 }

@@ -22,6 +22,7 @@ class MapLayersViewModel: ViewModel() {
     val initialized: MediatorLiveData<Boolean> = MediatorLiveData()
     var filter: ((String) -> Boolean)? = null
     val searchText: MutableLiveData<String?> = MutableLiveData()
+    var deleteMode: Boolean = false
     init {
         layers.addSource(LayerRepository.getLayers()) { value ->
             if (layersState.value == null)
@@ -121,6 +122,10 @@ class MapLayersViewModel: ViewModel() {
         }
         savedState = state
         layersState.value = savedState
+    }
+
+    fun deleteLayer(id: Long) {
+        LayerRepository.delete(id)
     }
 }
 

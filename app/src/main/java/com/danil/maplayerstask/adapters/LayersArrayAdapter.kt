@@ -96,6 +96,7 @@ class LayersArrayAdapter(
         val btnShowContours: ToggleButton = view.findViewById(R.id.btn_show_contours)
         private val btnList: ImageButton = view.findViewById(R.id.btn_list)
         private val btnAim: ImageButton = view.findViewById(R.id.btn_aim)
+        val btnDelete: ImageButton = view.findViewById(R.id.btn_delete)
         init {
             mainRow.setOnClickListener {
                 current?.let { dropView() }
@@ -112,6 +113,10 @@ class LayersArrayAdapter(
                 val cur = current ?: return@setOnCheckedChangeListener
                 cur.dash = checked
                 viewModel.handleLayerEvent(LayerEvent.Dash(cur))
+            }
+            btnDelete.setOnClickListener {
+                val cur = current ?: return@setOnClickListener
+                viewModel.deleteLayer(cur.id())
             }
         }
 
@@ -324,13 +329,11 @@ class LayersArrayAdapter(
                 holder.switch.isClickable = false
             }
 
-            if (reorder) {
-                holder.reorder.visibility = ImageButton.VISIBLE
-                holder.switch.visibility = SwitchCompat.GONE
-            } else {
-                holder.reorder.visibility = ImageButton.GONE
-                holder.switch.visibility = SwitchCompat.VISIBLE
-            }
+            holder.switch.visibility =
+                if (reorder || layersModel.deleteMode) SwitchCompat.GONE else SwitchCompat.VISIBLE
+            holder.reorder.visibility = if (reorder) ImageButton.VISIBLE else ImageButton.GONE
+            holder.btnDelete.visibility =
+                if (layersModel.deleteMode) ImageButton.VISIBLE else ImageButton.GONE
 
             holder.reorder.setOnTouchListener { _, event ->
                 if (event.actionMasked == MotionEvent.ACTION_DOWN) {
@@ -342,7 +345,6 @@ class LayersArrayAdapter(
     }
 
     override fun getItemCount(): Int {
-        Log.i("I", "COUNT === ${differ.currentList.size + headElementInds.size}")
         return differ.currentList.size + headElementInds.size
     }
 

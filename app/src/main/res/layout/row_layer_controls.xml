@@ -69,6 +69,18 @@
             android:alpha="0.5"
             android:visibility="gone"/>
 
+        <ImageButton
+            android:id="@+id/btn_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:layout_marginHorizontal="12dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_delete"
+            android:tint="@color/on_surf"
+            android:alpha="0.5"
+            android:visibility="gone"/>
+
     </LinearLayout>
 
     <LinearLayout

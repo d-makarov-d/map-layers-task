@@ -24,4 +24,15 @@ object LayerRepository {
         this.layers.value = layers
         layersMap = layers.associateBy { it.id() }.toMutableMap()
     }
+
+    /**
+     * Deletes layer
+     * @param id Layer ID
+     * @return true if deleted, false if not
+     */
+    fun delete(id: Long): Boolean {
+        if (layersMap.remove(id) == null) return false
+        this.layers.value = layersMap.values.toList()
+        return true
+    }
 }
