@@ -79,7 +79,6 @@ class LayersFragment: Fragment() {
         (list.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
 
         layersViewModel.layersFiltered.observe(viewLifecycleOwner) { layers ->
-            adapter.updateSearchState(layersViewModel.filter != null)
             adapter.updateAll(layers)
         }
         layersViewModel.drawSwitchMode.observe(viewLifecycleOwner) {

@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.danil.maplayerstask.R
 import com.danil.maplayerstask.models.LayerRepository
 import com.danil.maplayerstask.models.MapLayer
+import com.danil.maplayerstask.util.MAsyncListDifferWrapper
 import com.danil.maplayerstask.util.Util
 import com.danil.maplayerstask.viewmodels.LayerEvent
 import com.danil.maplayerstask.viewmodels.MapLayersViewModel
@@ -30,24 +31,6 @@ class LayersArrayAdapter(
     private val itemTouchHelper: ItemTouchHelper,
     private val layersModel: MapLayersViewModel
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    companion object {
-        val diffCallback = object : DiffUtil.ItemCallback<RowElement>() {
-            override fun areItemsTheSame(oldItem: RowElement, newItem: RowElement): Boolean {
-                return oldItem.id() == newItem.id()
-            }
-
-            override fun areContentsTheSame(oldItem: RowElement, newItem: RowElement): Boolean {
-                // Only externally changed properties must be compared here
-                return oldItem.id() == newItem.id() &&
-                        oldItem.active() == newItem.active() &&
-                        oldItem.category() == newItem.category() &&
-                        oldItem.name() == newItem.name() &&
-                        oldItem.numElements() == newItem.numElements() &&
-                        oldItem.sync() == newItem.sync() &&
-                        oldItem.zoomRange() == newItem.zoomRange()
-            }
-        }
-    }
     @ColorInt private val colorSecondary: Int
     @ColorInt private val colorOnPrimary: Int
     init {
@@ -64,14 +47,9 @@ class LayersArrayAdapter(
     private val strNElements = context.getString(R.string.num_elem)
     private val strZoom = context.getString(R.string.zoom)
     private val strOpacity = context.getString(R.string.opacity)
-    // list of first element in each category id
-    private var headElementInds: List<Int> = listOf()
-    private var headElementNames: Map<Int, String?> = mapOf()
     private var reorder = false
-    private var differ = AsyncListDiffer(this, diffCallback)
+    private var differ = MAsyncListDifferWrapper(this)
     private var recyclerView: RecyclerView? = null
-    private var primaryOrdering: Map<Long, Int>? = null
-    private var isSearching = false
 
     class ViewHolder(
         view: View,
@@ -167,34 +145,7 @@ class LayersArrayAdapter(
     }
 
     fun updateAll(layers: List<MapLayer>) {
-        // TODO optimize
-        // group items by category
-        val newLayers = layers.map { RowElement(
-            it,
-            differ.currentList.find { l -> l.id() == it.id() }?.dropdownOpen ?: false
-        ) }
-        val grouped: SortedMap<String?, List<RowElement>> = newLayers
-            .groupBy { it.category() }
-            .toSortedMap { key1, key2 ->
-                if (key1 == null) -1 else if (key2 == null) 1 else key1.compareTo(key2)
-            }
-        headElementInds = grouped.values.withIndex()
-            .fold<IndexedValue<List<RowElement>>, List<Int>>(listOf()) { acc, v ->
-                acc + listOf((acc.lastOrNull() ?: 0) + v.value.size + v.index)
-            }.dropLast(1)
-        headElementNames = (headElementInds zip grouped.keys.drop(1)).toMap()
-        val flat = grouped.toList().fold(listOf<RowElement>()) { l, r -> l + r.second }
-        if (
-            primaryOrdering != null &&
-            primaryOrdering!!.size == flat.size &&
-            primaryOrdering!!.keys.containsAll(flat.map { it.id() })
-        ) {
-            differ.submitList(flat.sortedBy { primaryOrdering!![it.id()] } )
-        } else {
-            if (flat.size <= 1)
-                notifyItemRangeRemoved(0, differ.currentList.size)
-            differ.submitList(flat)
-        }
+        differ.submitList(layers)
     }
 
     fun setReorder(reorder: Boolean) {
@@ -212,21 +163,10 @@ class LayersArrayAdapter(
     }
 
     fun moveItem(from: Int, to: Int): Boolean {
-        if (headElementInds.contains(from) || headElementInds.contains(to)) return false
-        if (
-            differ.currentList[adjustedPos(from)].category() !=
-            differ.currentList[adjustedPos(to)].category()
-        ) return false
-        val l = differ.currentList.toMutableList()
-        Collections.swap(l, adjustedPos(from), adjustedPos(to))
-        primaryOrdering = (l.map { it.id() } zip (0 until l.size)).toMap()
-        AsyncListDiffer(this, diffCallback)
-        differ.submitList(l) { notifyItemMoved(adjustedPos(to), adjustedPos(from)) }
-        notifyItemMoved(from, to)
-        return true
+        return differ.moveItem(from, to)
     }
 
-    class RowElement(
+    open class RowElement(
         layer: MapLayer,
         var dropdownOpen: Boolean
     ): MapLayer(
@@ -235,11 +175,7 @@ class LayersArrayAdapter(
     )
 
     override fun getItemId(position: Int): Long {
-        return if (headElementInds.contains(position)) {
-            super.getItemId(position)
-        } else {
-            differ.currentList.getOrNull(adjustedPos(position))?.id() ?: super.getItemId(position)
-        }
+        return differ.getItemId(position) ?: super.getItemId(position)
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -248,7 +184,7 @@ class LayersArrayAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position in headElementInds) 1 else 0
+        return if (differ.isHeadElement(position)) 1 else 0
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -264,12 +200,12 @@ class LayersArrayAdapter(
     }
 
     override fun onBindViewHolder(h: RecyclerView.ViewHolder, position: Int) {
-        if (headElementInds.contains(position)) {
+        if (differ.isHeadElement(position)) {
             val holder = h as HeaderHolder
-            holder.category.text = headElementNames[position]
+            holder.category.text = differ.getHeader(position)
         } else {
             val holder = h as ViewHolder
-            val item = differ.currentList.getOrNull(adjustedPos(position)) ?: return
+            val item = differ.getItem(position) ?: return
 
             holder.current = item
             val opacity = layersModel.layersState.value?.get(item.id())?.opacity ?: 1f
@@ -345,17 +281,6 @@ class LayersArrayAdapter(
     }
 
     override fun getItemCount(): Int {
-        return differ.currentList.size + headElementInds.size
-    }
-
-    private fun adjustedPos(position: Int): Int =
-        position - headElementInds.filter { it < position }.size
-
-    fun updateSearchState(search: Boolean) {
-        if (isSearching != search) {
-            isSearching = search
-            notifyItemRangeRemoved(0, differ.currentList.size)
-            differ.submitList(null)
-        }
+        return differ.getItemCount()
     }
 }
